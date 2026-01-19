@@ -19,16 +19,21 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: mbstring, bcmath, xml
+          extensions: mbstring, bcmath, xml, gd, zip
 
       - name: Install dependencies
         run: composer install --no-dev --optimize-autoloader
 
-      - name: Generate Laravel caches
+      # LANGKAH PENTING: Membangun aset CSS dan JS (Vite/Tailwind)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install NPM dependencies and build
         run: |
-          php artisan config:cache
-          php artisan route:cache
-          php artisan view:cache
+          npm install
+          npm run build
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -53,5 +58,4 @@ jobs:
           app-name: 'samafitro'
           slot-name: 'Production'
           package: .
-
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0543C1FB1BEF4691886EFCFF6186DFDD }}
